@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Révision des Tables de Multiplication</title>
+    <!-- Liaison avec le fichier CSS externe -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="card">
+        <!-- ÉCRAN D'ACCUEIL / CONFIGURATION -->
+        <div id="start-screen">
+            <h1>Options du Test</h1>
+            
+            <div class="config-group">
+                <label for="cfg-total-questions">Nombre total de questions :</label>
+                <input type="number" id="cfg-total-questions" value="10" min="1" max="50">
+            </div>
+
+            <div class="config-group">
+                <label for="cfg-time-limit">Temps par question (secondes) :</label>
+                <input type="number" id="cfg-time-limit" value="10" min="2" max="60">
+            </div>
+
+            <div class="config-group">
+                <label>Sélection des tables (Intervalle) :</label>
+                <div class="range-inputs">
+                    <span>De la table de</span>
+                    <input type="number" id="cfg-table-min" value="2" min="1" max="20">
+                    <span>à</span>
+                    <input type="number" id="cfg-table-max" value="10" min="1" max="20">
+                </div>
+            </div>
+
+            <button onclick="startGame()">Commencer le test</button>
+        </div>
+
+        <!-- ÉCRAN DE JEU -->
+        <div id="game-screen" class="hidden">
+            <div class="info">Question <span id="current-question">1</span> / <span id="total-questions-display">10</span></div>
+            
+            <div class="progress-container">
+                <div id="timer-bar" class="progress-bar"></div>
+            </div>
+
+            <div id="calcul-box" class="calcul">5 x 5</div>
+            
+            <form id="answer-form" onsubmit="submitAnswer(event)">
+                <input type="number" id="answer-input" class="answer-box" autocomplete="off" required>
+                <br>
+                <button type="submit">Valider</button>
+            </form>
+            
+            <div id="feedback-box" class="feedback"></div>
+        </div>
+
+        <!-- ÉCRAN DE FIN -->
+        <div id="end-screen" class="hidden">
+            <h1>Session terminée !</h1>
+            <div class="calcul" id="final-score">0 / 10</div>
+            <p class="info" id="final-comment"></p>
+            <button onclick="showStartScreen()">Retour à l'accueil</button>
+        </div>
+    </div>
+
+    <script>
+        let timeLimit = 10;
+        let totalQuestions = 10;
+        let tableMin = 2;
+        let tableMax = 10;
+
+        let score = 0;
+        let questionCount = 0;
+        let num1 = 0;
+        let num2 = 0;
+        let timerInterval = null;
+        let isWaitingForNext = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const timerBar = document.getElementById('timer-bar');
+        const calculBox = document.getElementById('calcul-box');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackBox = document.getElementById('feedback-box');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const totalQuestionsDisplay = document.getElementById('total-questions-display');
+        const finalScoreDiv = document.getElementById('final-score');
+        const finalCommentP = document.getElementById('final-comment');
+
+        function startGame() {
+            totalQuestions = parseInt(document.getElementById('cfg-total-questions').value, 10) || 10;
+            timeLimit = parseInt(document.getElementById('cfg-time-limit').value, 10) || 10;
+            tableMin = parseInt(document.getElementById('cfg-table-min').value, 10) || 2;
+            tableMax = parseInt(document.getElementById('cfg-table-max').value, 10) || 10;
+
+            if (tableMin > tableMax) {
+                const temp = tableMin;
+                tableMin = tableMax;
+                tableMax = temp;
+                document.getElementById('cfg-table-min').value = tableMin;
+                document.getElementById('cfg-table-max').value = tableMax;
+            }
+
+            score = 0;
+            questionCount = 0;
+            totalQuestionsDisplay.textContent = totalQuestions;
+
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            isWaitingForNext = false;
+            feedbackBox.textContent = "";
+            answerInput.value = "";
+            questionCount++;
+
+            if (questionCount > totalQuestions) {
+                endGame();
+                return;
+            }
+
+            currentQuestionSpan.textContent = questionCount;
+            
+            num1 = Math.floor(Math.random() * (tableMax - tableMin + 1)) + tableMin;
+            num2 = Math.floor(Math.random() * 9) + 2;
+            
+            calculBox.textContent = `${num1} x ${num2}`;
+            answerInput.focus();
+            
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerBar.style.width = "100%";
+            timerBar.style.backgroundColor = "var(--color-success)";
+
+            const intervalTime = 50;
+            const totalSteps = timeLimit * (1000 / intervalTime);
+            let currentStep = totalSteps;
+
+            timerInterval = setInterval(() => {
+                if (isWaitingForNext) return;
+
+                currentStep--;
+                const percentage = (currentStep / totalSteps) * 100;
+                
+                timerBar.style.width = percentage + "%";
+
+                if (percentage > 50) {
+                    timerBar.style.backgroundColor = "var(--color-success)";
+                } else if (percentage > 20) {
+                    timerBar.style.backgroundColor = "var(--color-warning)";
+                } else {
+                    timerBar.style.backgroundColor = "var(--color-danger)";
+                }
+
+                if (currentStep <= 0) {
+                    clearInterval(timerInterval);
+                    timeOut();
+                }
+            }, intervalTime);
+        }
+
+        function submitAnswer(event) {
+            event.preventDefault();
+            if (isWaitingForNext) return;
+            
+            clearInterval(timerInterval);
+            isWaitingForNext = true;
+
+            const userAnswer = parseInt(answerInput.value, 10);
+            const correctAnswer = num1 * num2;
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                showFeedback("Correct !", "correct");
+            } else {
+                showFeedback(`Faux ! C'était ${correctAnswer}`, "incorrect");
+            }
+
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function timeOut() {
+            isWaitingForNext = true;
+            const correctAnswer = num1 * num2;
+            showFeedback(`Temps écoulé ! C'était ${correctAnswer}`, "incorrect");
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function showFeedback(text, className) {
+            feedbackBox.textContent = text;
+            feedbackBox.className = `feedback ${className}`;
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreDiv.textContent = `${score} / ${totalQuestions}`;
+
+            const ratio = score / totalQuestions;
+            if (ratio === 1) {
+                finalCommentP.textContent = "Parfait ! Un sans-faute remarquable !";
+            } else if (ratio >= 0.7) {
+                finalCommentP.textContent = "Très bon score ! Tu maîtrises bien ces réglages.";
+            } else if (ratio >= 0.5) {
+                finalCommentP.textContent = "Pas mal, mais encore quelques hésitations.";
+            } else {
+                finalCommentP.textContent = "Il va falloir s'entraîner un peu plus sur cette configuration !";
+            }
+        }
+
+        function showStartScreen() {
+            endScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+

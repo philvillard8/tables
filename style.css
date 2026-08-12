@@ -1,0 +1,182 @@
+/* ==========================================
+   VARIABLES DE THÈME (Modifiables facilement)
+   ========================================== */
+:root {
+    --primary-color: #1a73e8;
+    --primary-hover: #1557b0;
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --border-color: #ced4da;
+    
+    /* Couleurs du timer / feedbacks */
+    --color-success: #4caf50;
+    --color-warning: #ff9800;
+    --color-danger: #f44336;
+}
+
+/* ==========================================
+   STRUCTURE GLOBALE
+   ========================================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 450px;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: var(--text-main);
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+   PANNEAU DE CONFIGURATION (ÉCRAN ACCUEIL)
+   ========================================== */
+.config-group {
+    text-align: left;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.config-group label {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.config-group input[type="number"] {
+    width: 70px;
+    padding: 6px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ==========================================
+   BARRE DE PROGRESSION (SLIDE BARRE CHRONO)
+   ========================================== */
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    height: 16px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-success);
+    transition: width 0.1s linear, background-color 0.5s ease;
+}
+
+/* ==========================================
+   ÉCRAN DE JEU (ZONE ZONE DE CALCUL / REQUÊTE)
+   ========================================== */
+.calcul {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 20px 0;
+    color: var(--primary-color);
+}
+
+.answer-box {
+    font-size: 1.5rem;
+    padding: 10px;
+    width: 120px;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+}
+
+.answer-box:focus {
+    border-color: var(--primary-color);
+}
+
+/* ==========================================
+   BOUTONS ET ÉLÉMENTS DE CONTRÔLE
+   ========================================== */
+button {
+    font-size: 1.2rem;
+    padding: 10px 25px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+.info {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+/* ==========================================
+   GESTION DES ÉTATS ET RETOURS VISUELS
+   ========================================== */
+.hidden {
+    display: none;
+}
+
+.feedback {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 15px;
+    height: 25px;
+}
+
+.correct { 
+    color: var(--color-success); 
+}
+
+.incorrect { 
+    color: var(--color-danger); 
+}
+
+
+select {
+    width: 100%;
+    padding: 6px;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+}
